@@ -1,41 +1,33 @@
-import numpy as np
-import math as mt
-import matplotlib.pyplot as plt
+import math
 
 
-def metEiLer(f, x0, y0, xn, h):
-    x = []
-    y = []
-    x.append(x0)
-    y.append(y0)
-    h = min(h, xn - x0)
-    while x0 < xn:
-        x0 += h
-        y0 += h * f(x0, y0)
-        x.append(x0)
-        y.append(y0)
-    return np.array(x), np.array(y)
+def int_prysms(f, a, b, n, mt=1 / 2):
+    m = n // 2
+    h = (b - a) / m
+    s1 = 0
+    x = a + mt * h
+    for k in range(m):
+        s1 = s1 + h * f(x)
+        x += h
+    h = (b - a) / n
+    s2 = 0
+    x = a + mt * h
+    for k in range(n):
+        s2 = s2 + h * f(x)
+        x += h
+    d = abs(s2 - s1) / 3
+    return s2, d
 
 
-def f(x, y):
-    return mt.cos(x) + 4 * y
+def f(x):
+    return math.sqrt(x) * math.cos(x**2)
 
 
-def f_res(x):
-    return (1 / 17) * (21 * mt.exp(4 * x) + mt.sin(x) - 4 * mt.cos(x))
+integral, pogresh = int_prysms(f, 0.4, 1.2, 200)
+print("s_integral =", "%f" % integral, "\tpogresh =", "%f" % pogresh)
 
+integral, pogresh = int_prysms(f, 0.4, 1.2, 200, 0)
+print("l_integral =", "%f" % integral, "\tpogresh =", "%f" % pogresh)
 
-xnew, ynew = metEiLer(f, 0, 1, 1, 0.1)
-yres = [f_res(i) for i in xnew]
-err = [mt.fabs(f_res(xnew[k] - ynew[k])) for k in range(len(xnew))]
-
-for j in range(len(xnew)):
-    print("%.1f %.3f %.4f" % (xnew[j], ynew[j], err[j]))
-
-plt.plot(xnew, ynew, "o", label="metEiLer", color="k")
-xres = np.linspace(np.min(xnew), np.max(xnew), 100)
-yres2 = [f_res(i) for i in xres]
-plt.plot(xres, yres2, lw=2, color="k", label="analytical solution")
-plt.grid(True)
-plt.legend()
-plt.show()
+integral, pogresh = int_prysms(f, 0.4, 1.2, 200, 1)
+print("p_integral =", "%f" % integral, "\tpogresh =", "%f" % pogresh)
